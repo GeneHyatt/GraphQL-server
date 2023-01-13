@@ -1,0 +1,45 @@
+type Bird {
+    commonName: String!
+    scientificName: String!
+    taxonomicOrder: Int!
+}
+
+type Location {
+    locationID: String!
+    state: State
+    county: String
+    location: String
+    latitude: Float
+    longitude: Float,
+}
+
+type State
+{
+    province: String
+}
+
+type Sighting {
+    ID: String
+    commonName: String
+    scientificName: String
+    taxonomicOrder: Int
+    count: Int
+    county: String
+    locationID: String
+    location: String
+    latitude: Float
+    longitude: Float
+    date: String
+    time: String
+    protocol: String
+    duration: Int
+    allObsReported: Int
+    distanceTraveled: String
+    areaCovered: String
+    numberOfObservers: Int
+    breedingCode: String
+    observationDetails: String
+    checklistComments: String
+    mlCatalogNumbers: String
+    state: State
+}

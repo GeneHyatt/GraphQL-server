@@ -1,178 +1,44 @@
-const express = require('express');
-const { graphqlHTTP } = require('express-graphql');
-const { buildSchema } = require('graphql');
+import express from 'express';
+import cors from 'cors';
+import { graphqlHTTP } from 'express-graphql';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+// Data source
+// import data from './data/ebird-data-sample.js';
+import data from './data/ebird-data.js';
 
-// TODO: Move this to separate file.
-const employeeArray = {
-  "employees": [
-    {
-      "name": "Abhishek",
-      "salary": "145000",
-      "currency": "USD",
-      "department": "Engineering",
-      "sub_department": "Platform"
+// Import typeDefs to pass to the schema
+import Sighting from './data/schemas/sighting.js';
+import Location from './data/schemas/location.js';
 
-    },
-    {
-      "name": "Anurag",
-      "salary": "90000",
-      "currency": "USD",
-      "department": "Banking",
-      "on_contract": "true",
-      "sub_department": "Loan"
-    },
-    {
-      "name": "Himani",
-      "salary": "240000",
-      "currency": "USD",
-      "department": "Engineering",
-      "sub_department": "Platform"
-    },
-    {
-      "name": "Yatendra",
-      "salary": "30",
-      "currency": "USD",
-      "department": "Operations",
-      "sub_department": "CustomerOnboarding"
-    },
-    {
-      "name": "Ragini",
-      "salary": "30",
-      "currency": "USD",
-      "department": "Engineering",
-      "sub_department": "Platform"
-    },
-    {
-      "name": "Nikhil",
-      "salary": "110000",
-      "currency": "USD",
-      "on_contract": "true",
-      "department": "Engineering",
-      "sub_department": "Platform"
-    },
-    {
-      "name": "Guljit",
-      "salary": "30",
-      "currency": "USD",
-      "department": "Administration",
-      "sub_department": "Agriculture"
-    },
-    {
-      "name": "Himanshu",
+// Import resolvers
+import resolvers from './resolvers/index.js';
 
-      "salary": "70000",
-      "currency": "EUR",
-      "department": "Operations",
-      "sub_department": "CustomerOnboarding"
-    },
-    {
-      "name": "Anupam",
-      "salary": "200000000",
-      "currency": "INR",
-      "department": "Engineering",
-      "sub_department": "Platform" }
-  ]
-};
+// Combine the typeDefs
+const typeDefs = `
+    ${Sighting}
+    ${Location}
+`;
 
-// GraphQL schema
-const schema = buildSchema(`
-    type Query {
-        employees: [Employee]
-        hello: String,
-        salaryStats: SalaryStats
-    },
-    type Employee {
-        name: String
-        salary: Int
-        currency: String
-        department: String
-        sub_department: String
-    },
-    type SalaryStats {
-      mean: Int
-      min: Int
-      max: Int
-    },
-    
-`);
+const executableSchema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+})
 
-// const schema = buildSchema(`
-//     type Query {
-//         employees(): [Employee]
-//         employee(id: ID): Employee
-//         getAllEmployeeSalaryStats: SalaryStats
-//     },
-//     type Employee {
-//         name: String
-//         salary: Int
-//         currency: String
-//         department: String
-//         sub_department: String
-//     },
-//     type SalaryStats {
-//         mean: Int!
-//         min: Int!
-//         max: Int!
-//     }
-// `);
-
-// enum Department {
-//   ENGINEERING
-//   OPERATIONS
-//   BILLING
-//   ADMINISTRATION
-// }
-const getEmployees = () => {
-  console.log('employeeArray', employeeArray);
-  return Promise.resolve(employeeArray.employees);
-}
-
-const salaryStats = () => {
-  const {employees} = employeeArray;
-  let salaryTotal = 0;
-  let initSal = 0;
-  const salary = employees.reduce((salary, currentValue) => salary + currentValue, initSal);
-  for (let i = 0; i < employees.length; i++) {
-    salaryTotal += parseInt(employees[i].salary);
-  }
-console.log('salary', initSal);
-console.log('salaryTotal',salaryTotal);
-  const mean = salaryTotal / employees.length;
-  const min = Math.min(salaryTotal);
-  const max = Math.max(salaryTotal);
-
-  return Promise.resolve({
-    mean, min, max
-  });
-}
-
-// Root resolver
-const root = {
-  hello: () => {
-    return "Hello world!";
-  },
-  employees: () => {
-    return getEmployees();
-  },
-  salaryStats: () => {
-    return salaryStats();
-  }
-};
-
-const employeeRoot = {
-  employees: () =>  getEmployees()
-};
 // Create an express server and a GraphQL endpoint
 const app = express();
+const port = 4000;
+
+// Set up the 'cors' headers
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
 app.use('/graphql', graphqlHTTP({
-  schema: schema,
-  rootValue: root,
+  schema: executableSchema,
+  context: data,
   graphiql: true
 }));
 
-app.use('/employees', graphqlHTTP({
-  schema: schema,
-  rootValue: employeeRoot,
-  graphiql: true
-}));
-app.listen(4000, () => console.log('Express GraphQL Server Now Running On localhost:4000/graphql'));
+app.listen(port, () => console.log(`Express GraphQL Server Now Running On localhost:${port}/graphql`));
+
+
