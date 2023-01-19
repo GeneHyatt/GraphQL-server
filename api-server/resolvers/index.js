@@ -7,6 +7,22 @@ const uniqueValues = (array, propertyName) => {
 // TODO: move the different specific resolvers to their own files.
 const resolvers = {
   Query: {
+    birds: (obj, args, context) => {
+      return Promise.resolve(uniqueValues(context.sightings, 'commonName'));
+
+    },
+    // birds: (obj, args, context) => {
+    //   console.log('birds', context.sightings);
+    //   // console.log('context', context);
+    //   const birdArray = context.sightings.map((item) => {
+    //     return {
+    //       commonName: item.commonName,
+    //       scientificName: item.scientificName,
+    //       taxonomicOrder: item.taxonomicOrder
+    //     };
+    //   });
+    //   return Promise.resolve(birdArray);
+    // },
     sightings: (obj, args, context) => {
       return context.sightings;
     },

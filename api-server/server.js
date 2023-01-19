@@ -9,6 +9,7 @@ import data from './data/ebird-data.js';
 // Import typeDefs to pass to the schema
 import Sighting from './data/schemas/sighting.js';
 import Location from './data/schemas/location.js';
+import Bird from './data/schemas/bird.js';
 
 // Import resolvers
 import resolvers from './resolvers/index.js';
@@ -17,6 +18,7 @@ import resolvers from './resolvers/index.js';
 const typeDefs = `
     ${Sighting}
     ${Location}
+    ${Bird}
 `;
 
 const executableSchema = makeExecutableSchema({

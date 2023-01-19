@@ -1,9 +1,13 @@
 const Bird = `
+  type Query {
+    birds: [Bird]
+  }
+
   type Bird {
-      commonName: String!
-      scientificName: String!
+      commonName: String
+      scientificName: String
       taxonomicOrder: Int!
   }
 `;
 
-export default () => Bird;
+export default Bird;
